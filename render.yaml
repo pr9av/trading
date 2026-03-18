@@ -29,6 +29,11 @@ services:
     startCommand: cd services/market-data && python main.py
     envVars:
       - fromGroup: blueprint-env-vars
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: blauplug-redis
+          property: connectionString
 
   # ── Order Management (Private Service) ─────────────────────
   - type: pserv
