@@ -65,9 +65,8 @@ services:
       - fromGroup: blueprint-env-vars
 
   # ── Flutter Dashboard (Static Site) ─────────────────────────
-  - type: web
+  - type: static
     name: flutter-dashboard
-    env: static
     buildCommand: cd flutter_dashboard && flutter build web --release
     publishDir: flutter_dashboard/build/web
     envVars:
@@ -77,15 +76,16 @@ services:
           name: api-gateway
           property: host
 
+  # ── Redis (Managed Redis) ───────────────────────────────────
+  - type: redis
+    name: blauplug-redis
+    plan: free
+    ipAllowList: [] # Only allow internal traffic
+
 # ── Databases ────────────────────────────────────────────────
 databases:
   - name: blauplug-postgres
     plan: free
-
-redis:
-  - name: blauplug-redis
-    plan: free
-    ipAllowList: [] # Only allow internal traffic
 
 # ── Environment Variable Groups ──────────────────────────────
 envVarGroups:
