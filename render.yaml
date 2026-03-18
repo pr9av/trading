@@ -1,0 +1,99 @@
+# Render Blueprint Specification (render.yaml)
+# Use this to deploy the entire Blauplug Trading Platform to Render.
+# For more info: https://render.com/docs/blueprints
+
+services:
+  # ── API Gateway (Web Service) ──────────────────────────────
+  - type: web
+    name: api-gateway
+    env: python
+    buildCommand: pip install -r services/api-gateway/requirements.txt
+    startCommand: cd services/api-gateway && python main.py
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: blauplug-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromRedis:
+          name: blauplug-redis
+          property: connectionString
+      - fromGroup: blueprint-env-vars
+
+  # ── Market Data (Private Service) ──────────────────────────
+  - type: pserv
+    name: market-data
+    env: python
+    buildCommand: pip install -r services/market-data/requirements.txt
+    startCommand: cd services/market-data && python main.py
+    envVars:
+      - fromGroup: blueprint-env-vars
+
+  # ── Order Management (Private Service) ─────────────────────
+  - type: pserv
+    name: order-management
+    env: python
+    buildCommand: pip install -r services/order-management/requirements.txt
+    startCommand: cd services/order-management && python main.py
+    envVars:
+      - fromGroup: blueprint-env-vars
+      - key: DATABASE_URL
+        fromDatabase:
+          name: blauplug-postgres
+          property: connectionString
+
+  # ── Trade Execution (Private Service) ──────────────────────
+  - type: pserv
+    name: trade-execution
+    env: python
+    buildCommand: pip install -r services/trade-execution/requirements.txt
+    startCommand: cd services/trade-execution && python main.py
+    envVars:
+      - fromGroup: blueprint-env-vars
+      - key: DATABASE_URL
+        fromDatabase:
+          name: blauplug-postgres
+          property: connectionString
+
+  # ── AI Signal (Private Service) ─────────────────────────────
+  - type: pserv
+    name: ai-signal
+    env: python
+    buildCommand: pip install -r services/ai-signal/requirements.txt
+    startCommand: cd services/ai-signal && python main.py
+    envVars:
+      - fromGroup: blueprint-env-vars
+
+  # ── Flutter Dashboard (Static Site) ─────────────────────────
+  - type: web
+    name: flutter-dashboard
+    env: static
+    buildCommand: cd flutter_dashboard && flutter build web --release
+    publishDir: flutter_dashboard/build/web
+    envVars:
+      - key: API_BASE_URL
+        fromService:
+          type: web
+          name: api-gateway
+          property: host
+
+# ── Databases ────────────────────────────────────────────────
+databases:
+  - name: blauplug-postgres
+    plan: free
+
+redis:
+  - name: blauplug-redis
+    plan: free
+    ipAllowList: [] # Only allow internal traffic
+
+# ── Environment Variable Groups ──────────────────────────────
+envVarGroups:
+  - name: blueprint-env-vars
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: KAFKA_BOOTSTRAP_SERVERS
+        value: YOUR_MANAGED_KAFKA_URL # Recommending Upstash or Confluent Cloud for Render
+      - key: ACTIVE_BROKER
+        value: simulated

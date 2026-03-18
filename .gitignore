@@ -1,0 +1,66 @@
+# ── Python ──────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+venv/
+.venv/
+env/
+.env
+!.env.example
+
+# ── Jupyter ──────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── Docker ───────────────────────────────────────
+.dockerignore
+
+# ── Models ───────────────────────────────────────
+*.pt
+*.pth
+*.onnx
+*.pkl
+models/
+
+# ── Flutter / Dart ───────────────────────────────
+flutter_dashboard/.dart_tool/
+flutter_dashboard/.flutter-plugins
+flutter_dashboard/.flutter-plugins-dependencies
+flutter_dashboard/.packages
+flutter_dashboard/build/
+flutter_dashboard/.pub-cache/
+flutter_dashboard/.pub/
+flutter_dashboard/**/.dart_tool/
+*.g.dart
+*.freezed.dart
+
+# ── IDEs ─────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Logs ─────────────────────────────────────────
+*.log
+logs/
+
+# ── Data volumes (local dev) ─────────────────────
+postgres_data/
+redis_data/
+
+# ── Secrets ──────────────────────────────────────
+.env
+*.pem
+*.key
+secrets/

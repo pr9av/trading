@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  # Infrastructure (Same as dev but with fixed versions and restart: always)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - trading-net
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    restart: always
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - trading-net
+
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - trading-net
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - trading-net
+
+  # Microservices (Pre-built images would be used here in a real CI/CD)
+  # For now, we still build but with production optimizations (already in Dockerfiles)
+  
+  api-gateway:
+    build: ./services/api-gateway
+    restart: always
+    env_file: .env
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+    networks:
+      - trading-net
+
+  market-data:
+    build: ./services/market-data
+    restart: always
+    env_file: .env
+    depends_on:
+      - kafka
+      - redis
+    networks:
+      - trading-net
+
+  order-management:
+    build: ./services/order-management
+    restart: always
+    env_file: .env
+    depends_on:
+      - postgres
+      - kafka
+    networks:
+      - trading-net
+
+  trade-execution:
+    build: ./services/trade-execution
+    restart: always
+    env_file: .env
+    depends_on:
+      - kafka
+      - redis
+    networks:
+      - trading-net
+
+  ai-signal:
+    build: ./services/ai-signal
+    restart: always
+    env_file: .env
+    depends_on:
+      - kafka
+    networks:
+      - trading-net
+
+  flutter-dashboard:
+    build: ./flutter_dashboard
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - trading-net
+
+networks:
+  trading-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
