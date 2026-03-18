@@ -65,10 +65,11 @@ services:
       - fromGroup: blueprint-env-vars
 
   # ── Flutter Dashboard (Static Site) ─────────────────────────
-  - type: static
+  - type: web
     name: flutter-dashboard
+    runtime: static
     buildCommand: cd flutter_dashboard && flutter build web --release
-    publishDir: flutter_dashboard/build/web
+    staticPublishPath: flutter_dashboard/build/web
     envVars:
       - key: API_BASE_URL
         fromService:
