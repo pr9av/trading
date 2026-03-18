@@ -55,6 +55,11 @@ services:
         fromDatabase:
           name: blauplug-postgres
           property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: blauplug-redis
+          property: connectionString
 
   # ── AI Signal (Private Service) ─────────────────────────────
   - type: pserv
