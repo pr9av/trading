@@ -11,11 +11,13 @@ A modular, real-time trading infrastructure platform for Blauplug Innovation Pvt
 
 ## 🛠️ Quick Start
 
-### 1. Backend & Database
+### 1. Backend & Database Setup
 To run the server and the simulated market data:
-1. Navigate to `/backend`, run `npm install`, and configure your `.env`.
-2. Run `npm run dev` to start the Node.js api.
-3. (In a separate terminal) Run `python simulate.py` to start the live market feed.
+1. Navigate to `/backend` and run `npm install`.
+2. Create your `.env` file (copy `.env.example`) and add your `DATABASE_URL`.
+3. **Initialize the Database**: Run `node init_db.js` to automatically apply the schema to your Neon Postgres.
+4. **Start the API**: Run `npm run dev`.
+5. **Start Market Data**: (In a separate terminal) Run `python simulate.py` from the root folder.
 
 ### 2. Frontend Dashboard
 1. Navigate to `/flutter_dashboard`.
