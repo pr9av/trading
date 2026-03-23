@@ -19,6 +19,19 @@ To run the server and the simulated market data:
 4. **Start the API**: Run `npm run dev`.
 5. **Start Market Data**: (In a separate terminal) Run `python simulate.py` from the root folder.
 
+### 🔑 How to get your Credentials
+
+*   **DATABASE_URL (Neon Postgres)**:
+    1.  Go to [Neon.tech](https://neon.tech/) and create a free account.
+    2.  Create a project named `trading-platform`.
+    3.  Copy the **Connection String** from the dashboard. Ensure it starts with `postgres://`.
+    4.  Paste this into your `.env` file as `DATABASE_URL`.
+*   **JWT_SECRET**:
+    1.  This can be any random string (e.g., `my_secret_key_123`).
+    2.  It is used to sign your login tokens.
+*   **PORT**:
+    1.  Default is `8000`. Ensure this matches your frontend `api_config.dart`.
+
 ### 2. Frontend Dashboard
 1. Navigate to `/flutter_dashboard`.
 2. Run `flutter pub get`.
