@@ -1,8 +1,0 @@
-# ── Trade Execution Engine — Python Dependencies ──────────────────────────────
-fastapi==0.110.0
-uvicorn[standard]==0.29.0
-confluent-kafka==2.3.0
-prometheus-fastapi-instrumentator==6.1.0
-redis==5.0.4
-python-dotenv==1.0.1
-psycopg2-binary==2.9.9

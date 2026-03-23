@@ -31,17 +31,16 @@ env/
 *.pkl
 models/
 
-# ── Flutter / Dart ───────────────────────────────
-flutter_dashboard/.dart_tool/
-flutter_dashboard/.flutter-plugins
-flutter_dashboard/.flutter-plugins-dependencies
-flutter_dashboard/.packages
-flutter_dashboard/build/
-flutter_dashboard/.pub-cache/
-flutter_dashboard/.pub/
-flutter_dashboard/**/.dart_tool/
-*.g.dart
-*.freezed.dart
+# ── Local Assets (Excluded from Git) ─────────────
+flutter_dashboard/
+HOW_IT_WORKS.md
+antigravity_prompt_v2.md
+debug.txt
+package.json
+package-lock.json
+run_local.ps1
+run_v2.ps1
+backend/README.md
 
 # ── IDEs ─────────────────────────────────────────
 .idea/
@@ -58,6 +57,12 @@ logs/
 # ── Data volumes (local dev) ─────────────────────
 postgres_data/
 redis_data/
+
+# ── Node.js ──────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # ── Secrets ──────────────────────────────────────
 .env

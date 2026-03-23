@@ -1,54 +1,31 @@
-# Blauplug Trading Infrastructure Platform
+# 🚀 Blauplug Trading Platform V2
 
-A production-grade real-time trading infrastructure platform for Blauplug Innovation Pvt Ltd. Built with a microservice architecture, Apache Kafka for event streaming, and a Flutter dashboard.
+A modular, real-time trading infrastructure platform for Blauplug Innovation Pvt Ltd. This repository contains both the high-performance Node.js backend and the modern Flutter analytics dashboard.
 
-## Architecture
+## 🏗️ Project Structure
 
-- **API Gateway**: Entry point for JWT auth, RBAC, and service routing.
-- **Market Data Service**: Ingests real-time ticks from Zerodha/Upstox/Simulated feeds.
-- **Order Management (OMS)**: Manages order lifecycle and broker routing.
-- **Trade Execution Engine**: Matches orders and updates portfolios.
-- **AI Signal Service**: Generates trading signals using an LSTM model.
-- **Flutter Dashboard**: Real-time trading interface.
+* **`/backend`**: The Node.js Express server handling authentication, market data WebSocket relays, and analytics. [View Backend README](./backend/README.md)
+* **`/flutter_dashboard`**: The real-time trading interface built with Flutter & Riverpod.
+* **`/database`**: PostgreSQL schema definitions and setup scripts.
+* **`simulate.py`**: A Python-based market simulator to pump data for testing.
 
-## Quick Start
+## 🛠️ Quick Start
 
-### 1. Prerequisites
-- Docker & Docker Compose
-- Flutter SDK (for dashboard)
-- Zerodha/Upstox API Keys (optional, fallback to simulation available)
+### 1. Backend & Database
+To run the server and the simulated market data:
+1. Navigate to `/backend`, run `npm install`, and configure your `.env`.
+2. Run `npm run dev` to start the Node.js api.
+3. (In a separate terminal) Run `python simulate.py` to start the live market feed.
 
-### 2. Configure Environment
-Copy `.env.example` to `.env` and fill in your credentials.
-```bash
-cp .env.example .env
-```
+### 2. Frontend Dashboard
+1. Navigate to `/flutter_dashboard`.
+2. Run `flutter pub get`.
+3. Run `flutter run -d chrome` (or your preferred device).
 
-### 3. Run Backend
-```bash
-docker-compose up -d --build
-```
-
-### 4. Verify Services
-- API Gateway: http://localhost:8000
-- Prometheus: http://localhost:9090
-- Grafana: http://localhost:3000 (admin/admin)
-
-### 5. Run Flutter Dashboard
-```bash
-cd flutter_dashboard
-flutter pub get
-flutter run
-```
-
-## Monitoring & Observability
-The platform includes built-in monitoring using Prometheus and Grafana. Dashboards are auto-provisioned for service health, trade latency, and Kafka throughput.
-
-## Security
-- **JWT Authentication**: Secured endpoints.
-- **RBAC**: Admin/Trader roles.
-- **Rate Limiting**: Redis-backed sliding window.
-- **Secrets Management**: Credentials stored in environment variables.
+---
+## 📄 Documentation
+* [How it Works](./HOW_IT_WORKS.md) - A simple guide to the system architecture.
+* [Backend Setup](./backend/README.md) - Detailed instructions for the server-side.
 
 ---
 © 2026 Blauplug Innovation Pvt Ltd.

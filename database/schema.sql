@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_users_email    ON users (email);
-CREATE INDEX idx_users_username ON users (username);
+CREATE INDEX IF NOT EXISTS idx_users_email    ON users (email);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users (username);
 
 -- ============================================================
 --   PORTFOLIOS
@@ -56,8 +56,8 @@ CREATE TABLE IF NOT EXISTS portfolio_holdings (
     UNIQUE (portfolio_id, symbol, exchange)
 );
 
-CREATE INDEX idx_holdings_portfolio ON portfolio_holdings (portfolio_id);
-CREATE INDEX idx_holdings_symbol    ON portfolio_holdings (symbol);
+CREATE INDEX IF NOT EXISTS idx_holdings_portfolio ON portfolio_holdings (portfolio_id);
+CREATE INDEX IF NOT EXISTS idx_holdings_symbol    ON portfolio_holdings (symbol);
 
 -- ============================================================
 --   ORDERS
@@ -85,10 +85,10 @@ CREATE TABLE IF NOT EXISTS orders (
     updated_at      TIMESTAMPTZ   NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_orders_user_id ON orders (user_id);
-CREATE INDEX idx_orders_symbol  ON orders (symbol);
-CREATE INDEX idx_orders_status  ON orders (status);
-CREATE INDEX idx_orders_created ON orders (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders (user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_symbol  ON orders (symbol);
+CREATE INDEX IF NOT EXISTS idx_orders_status  ON orders (status);
+CREATE INDEX IF NOT EXISTS idx_orders_created ON orders (created_at DESC);
 
 -- ============================================================
 --   TRADES
@@ -111,10 +111,10 @@ CREATE TABLE IF NOT EXISTS trades (
     created_at      TIMESTAMPTZ   NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_trades_user_id    ON trades (user_id);
-CREATE INDEX idx_trades_order_id   ON trades (order_id);
-CREATE INDEX idx_trades_symbol     ON trades (symbol);
-CREATE INDEX idx_trades_executed_at ON trades (executed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trades_user_id    ON trades (user_id);
+CREATE INDEX IF NOT EXISTS idx_trades_order_id   ON trades (order_id);
+CREATE INDEX IF NOT EXISTS idx_trades_symbol     ON trades (symbol);
+CREATE INDEX IF NOT EXISTS idx_trades_executed_at ON trades (executed_at DESC);
 
 -- ============================================================
 --   TRANSACTIONS (cash ledger)
@@ -130,8 +130,8 @@ CREATE TABLE IF NOT EXISTS transactions (
     created_at      TIMESTAMPTZ   NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_transactions_user_id   ON transactions (user_id);
-CREATE INDEX idx_transactions_created_at ON transactions (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_transactions_user_id   ON transactions (user_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions (created_at DESC);
 
 -- ============================================================
 --   AUDIT LOGS
@@ -150,14 +150,14 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_audit_logs_user_id    ON audit_logs (user_id);
-CREATE INDEX idx_audit_logs_service    ON audit_logs (service);
-CREATE INDEX idx_audit_logs_created_at ON audit_logs (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id    ON audit_logs (user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_service    ON audit_logs (service);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs (created_at DESC);
 
 -- ============================================================
---   MARKET TICKS (TimescaleDB Hypertable)
+--   PRICE TICKS (TimescaleDB Hypertable)
 -- ============================================================
-CREATE TABLE IF NOT EXISTS market_ticks (
+CREATE TABLE IF NOT EXISTS price_ticks (
     time            TIMESTAMPTZ   NOT NULL,
     symbol          VARCHAR(32)   NOT NULL,
     exchange        VARCHAR(16)   NOT NULL DEFAULT 'NSE',
@@ -173,10 +173,26 @@ CREATE TABLE IF NOT EXISTS market_ticks (
     broker_source   VARCHAR(32)
 );
 
-CREATE INDEX idx_market_ticks_symbol ON market_ticks (symbol, time DESC);
+CREATE INDEX IF NOT EXISTS idx_price_ticks_symbol ON price_ticks (symbol, time DESC);
 
--- Convert to TimescaleDB hypertable (run only if TimescaleDB extension is enabled)
--- SELECT create_hypertable('market_ticks', 'time', if_not_exists => TRUE);
+-- ============================================================
+--   OHLC CANDLES (Aggregated Data)
+-- ============================================================-- 4. 1-minute OHLC candles (materialized from ticks or fetched from Kite)
+CREATE TABLE IF NOT EXISTS price_candles (
+    time        TIMESTAMPTZ NOT NULL,
+    symbol      TEXT        NOT NULL,
+    exchange    TEXT        NOT NULL,
+    open        NUMERIC     NOT NULL,
+    high        NUMERIC     NOT NULL,
+    low         NUMERIC     NOT NULL,
+    close       NUMERIC     NOT NULL,
+    volume      BIGINT
+);
+
+-- Fallback to standard PostgreSQL index instead of Hypertable
+CREATE INDEX IF NOT EXISTS idx_price_candles_symbol_time ON price_candles (symbol, time DESC);
+
+-- Removed api_logs to resolve Neon deployment collision.
 
 -- ============================================================
 --   AI SIGNALS
@@ -191,8 +207,8 @@ CREATE TABLE IF NOT EXISTS ai_signals (
     generated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_ai_signals_symbol       ON ai_signals (symbol);
-CREATE INDEX idx_ai_signals_generated_at ON ai_signals (generated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_signals_symbol       ON ai_signals (symbol);
+CREATE INDEX IF NOT EXISTS idx_ai_signals_generated_at ON ai_signals (generated_at DESC);
 
 -- ============================================================
 --   SEED: Default Admin User

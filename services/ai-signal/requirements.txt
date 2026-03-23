@@ -1,8 +1,0 @@
-# ── AI Signal Service — Python Dependencies ──────────────────────────────────
-fastapi==0.110.0
-uvicorn[standard]==0.29.0
-torch==2.2.1
-confluent-kafka==2.3.0
-prometheus-fastapi-instrumentator==6.1.0
-numpy==1.26.4
-python-dotenv==1.0.1
