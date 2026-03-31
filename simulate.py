@@ -57,7 +57,7 @@ def generate_tick(symbol, current_price, volatility):
 
 import requests
 
-API_URL = f"http://localhost:{os.getenv('API_GATEWAY_PORT', '8000')}/api/ticks"
+API_URL = f"http://localhost:{os.getenv('API_GATEWAY_PORT', '8000')}/v1/ticks"
 
 def run_simulation():
     print(f"[*] Simulation Engine Started (Interval: {INTERVAL_SEC}s)", flush=True)

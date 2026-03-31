@@ -21,27 +21,6 @@ env/
 .ipynb_checkpoints/
 *.ipynb
 
-# ── Docker ───────────────────────────────────────
-.dockerignore
-
-# ── Models ───────────────────────────────────────
-*.pt
-*.pth
-*.onnx
-*.pkl
-models/
-
-# ── Local Assets (Excluded from Git) ─────────────
-flutter_dashboard/
-HOW_IT_WORKS.md
-antigravity_prompt_v2.md
-debug.txt
-package.json
-package-lock.json
-run_local.ps1
-run_v2.ps1
-backend/README.md
-
 # ── IDEs ─────────────────────────────────────────
 .idea/
 .vscode/
@@ -69,3 +48,5 @@ yarn-error.log*
 *.pem
 *.key
 secrets/
+credentials.json
+token.json
