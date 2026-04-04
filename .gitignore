@@ -43,3 +43,9 @@ Thumbs.db
 build/
 ios/Flutter/Generated.xcframework
 android/app/src/main/res/drawable-xhdpi/
+
+# Python Virtual Environment
+venv/
+.venv/
+env/
+.env/
