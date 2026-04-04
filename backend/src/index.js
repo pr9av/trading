@@ -7,6 +7,8 @@ const { AppError } = require('./errors');
 const requireAuth = require('./middleware/auth');
 const { apiLimiter, authLimiter } = require('./middleware/rateLimit');
 const cacheMiddleware = require('./middleware/cache');
+const { isMarketOpen, getMarketStatus } = require('./utils/marketHours');
+const { initRedis } = require('./redis');
 
 const app = express();
 const PORT = process.env.API_GATEWAY_PORT || 8000;
@@ -26,6 +28,23 @@ const wss = new WebSocket.Server({ server, path: '/ws/market' });
 
 wss.on('connection', (ws) => {
     console.log('[WS] Client connected to market stream');
+
+    // Send market status immediately on connect
+    const status = getMarketStatus();
+    ws.send(JSON.stringify({
+        type: 'MARKET_STATUS',
+        ...status,
+    }));
+
+    // If market is closed, inform the client
+    if (!status.is_open) {
+        ws.send(JSON.stringify({
+            type: 'MARKET_CLOSED',
+            message: status.message,
+            next_open: status.next_open,
+        }));
+    }
+
     ws.on('close', () => console.log('[WS] Client disconnected'));
 });
 
@@ -41,20 +60,37 @@ const candlesRouter = require('./routes/candles');
 const analyticsRouter = require('./routes/analytics');
 const compareRouter = require('./routes/compare');
 const fundamentalsRouter = require('./routes/fundamentals');
+const aiRouter = require('./routes/ai');
+const marketRouter = require('./routes/market');
+const tradesRouter = require('./routes/trades');
+const journalRouter = require('./routes/journal');
+const instrumentsRouter = require('./routes/instruments');
+const analysisRouter = require('./routes/analysis');
 
 // ── Health Check (public) ───────────────────────────────────
-app.get('/health', (req, res) => res.json({ status: 'UP', version: 'v1', timestamp: new Date() }));
+app.get('/health', (req, res) => res.json({
+    status: 'UP',
+    version: 'v1',
+    timestamp: new Date(),
+    market: getMarketStatus(),
+}));
 
 // ── V1 Routes ───────────────────────────────────────────────
 // Public routes
 app.use('/v1/auth', authLimiter, authRouter);
 app.use('/v1/ticks', ticksRouter);
+app.use('/v1/market', marketRouter);  // Public: market status
 
 // Protected routes (JWT + cache on reads)
 app.use('/v1/candles', requireAuth, cacheMiddleware(30), candlesRouter);
 app.use('/v1/analytics', requireAuth, cacheMiddleware(60), analyticsRouter);
 app.use('/v1/compare', requireAuth, cacheMiddleware(60), compareRouter);
 app.use('/v1/fundamentals', requireAuth, cacheMiddleware(300), fundamentalsRouter);
+app.use('/v1/ai', requireAuth, aiRouter);
+app.use('/v1/trades', requireAuth, tradesRouter);
+app.use('/v1/journal', requireAuth, journalRouter);
+app.use('/v1/instruments', requireAuth, instrumentsRouter);
+app.use('/v1/analysis', requireAuth, analysisRouter);
 
 // ── Global Error Handler ────────────────────────────────────
 // eslint-disable-next-line no-unused-vars
@@ -76,7 +112,19 @@ app.use((err, req, res, next) => {
 // ── Start Background Jobs ───────────────────────────────────
 require('./jobs/fetchCandles');
 
-// ── Start Server ────────────────────────────────────────────
-server.listen(PORT, () => {
-    console.log(`🚀 Blauplug V1 API (HTTP+WS) running on port ${PORT}`);
-});
+// ── Initialize Services + Start Server ──────────────────────
+(async () => {
+    // Initialize Redis (non-blocking, falls back to in-memory)
+    await initRedis().catch(err => console.warn('[Redis] Init skipped:', err.message));
+
+    // Start Zerodha Ticker (market-hours-aware)
+    if (process.env.ACTIVE_BROKER === 'zerodha') {
+        require('./jobs/zerodhaTicker');
+    }
+
+    server.listen(PORT, () => {
+        const status = getMarketStatus();
+        console.log(`🚀 Blauplug V1 API (HTTP+WS) running on port ${PORT}`);
+        console.log(`📊 Market Mode: ${status.mode} | ${status.message}`);
+    });
+})();

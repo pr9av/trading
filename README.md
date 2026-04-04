@@ -1,46 +1,54 @@
-# 🚀 Blauplug Trading Platform V2
+# Blauplug Trading Platform V2
 
-A modular, real-time trading infrastructure platform for Blauplug Innovation Pvt Ltd. This repository contains both the high-performance Node.js backend and the modern Flutter analytics dashboard.
+Blauplug V2 is a production-ready, real-time virtual trading platform and market analytics suite. It integrates with the Zerodha Kite Connect API for live market data and utilizes Google Gemini AI for advanced multi-period technical analysis.
 
-## 🏗️ Project Structure
+## 🚀 Features
 
-* **`/backend`**: The Node.js Express server handling authentication, market data WebSocket relays, and analytics. [View Backend README](./backend/README.md)
-* **`/flutter_dashboard`**: The real-time trading interface built with Flutter & Riverpod.
-* **`/database`**: PostgreSQL schema definitions and setup scripts.
-* **`simulate.py`**: A Python-based market simulator to pump data for testing.
+*   **Real-Time Dashboard**: Live data streaming of NSE instruments via Zerodha WebSocket.
+*   **AI-Powered Insights**: Professional technical analysis across 1D, 1W, and 1M timeframes using Gemini 2.0 Flash.
+*   **Historical Charting**: High-performance OHLC candlestick charts with custom range selection.
+*   **Portfolio Management**: Secure per-user trade journal, watchlist, and behavioral analytics.
+*   **Market State Aware**: Automatic switching between Live and Historical modes based on NSE market hours.
+*   **Resilient Backend**: In-memory caching, rate limiting, and robust error handling.
 
-## 🛠️ Quick Start
+## 🛠️ Tech Stack
 
-### 1. Backend & Database Setup
-To run the server and the simulated market data:
-1. Navigate to `/backend` and run `npm install`.
-2. Create your `.env` file (copy `.env.example`) and add your `DATABASE_URL`.
-3. **Initialize the Database**: Run `node init_db.js` to automatically apply the schema to your Neon Postgres.
-4. **Start the API**: Run `npm run dev`.
-5. **Start Market Data**: (In a separate terminal) Run `python simulate.py` from the root folder.
+*   **Frontend**: Flutter (Riverpod for state management, Candlesticks for charting).
+*   **Backend**: Node.js, Express.
+*   **Database**: PostgreSQL (Relational data), Redis (Pub/Sub & Caching).
+*   **APIs**: Zerodha Kite Connect, Google Gemini AI.
 
-### 🔑 How to get your Credentials
+## 📦 Installation & Setup
 
-*   **DATABASE_URL (Neon Postgres)**:
-    1.  Go to [Neon.tech](https://neon.tech/) and create a free account.
-    2.  Create a project named `trading-platform`.
-    3.  Copy the **Connection String** from the dashboard. Ensure it starts with `postgres://`.
-    4.  Paste this into your `.env` file as `DATABASE_URL`.
-*   **JWT_SECRET**:
-    1.  This can be any random string (e.g., `my_secret_key_123`).
-    2.  It is used to sign your login tokens.
-*   **PORT**:
-    1.  Default is `8000`. Ensure this matches your frontend `api_config.dart`.
+### Prerequisites
+*   Flutter SDK
+*   Node.js (v18+)
+*   PostgreSQL & Redis
+*   Zerodha Developer API Key & Secret
 
-### 2. Frontend Dashboard
-1. Navigate to `/flutter_dashboard`.
-2. Run `flutter pub get`.
-3. Run `flutter run -d chrome` (or your preferred device).
+### 1. Database Setup
+Create a PostgreSQL database and run the initial migrations (or let the app sync instruments on startup).
 
----
-## 📄 Documentation
-* [How it Works](./HOW_IT_WORKS.md) - A simple guide to the system architecture.
-* [Backend Setup](./backend/README.md) - Detailed instructions for the server-side.
+### 2. Backend Configuration
+Navigate to the `backend/` directory and create a `.env` file:
+```env
+PORT=8000
+DATABASE_URL=postgres://user:password@localhost:5432/blauplug
+REDIS_URL=redis://localhost:6379
+ZERODHA_API_KEY=your_kite_key
+ZERODHA_API_SECRET=your_kite_secret
+ZERODHA_ACCESS_TOKEN=your_refreshed_token
+GEMINI_API_KEY=your_gemini_key
+JWT_SECRET=your_jwt_secret
+```
+Run `npm install` and then `npm start`.
 
----
-© 2026 Blauplug Innovation Pvt Ltd.
+### 3. Frontend Configuration
+Navigate to the `frontend/` directory. Ensure `lib/config/api_config.dart` points to your backend URL.
+Run `flutter pub get` and then `flutter run`.
+
+## 🤖 AI Multi-Period Analysis
+The platform features a custom-built AI engine that gathers historical trends (Short, Medium, and Long term) and summarizes them into a single actionable report per stock. Results are cached for 10 minutes to optimize API usage.
+
+## 📄 License
+Proprietary — Blauplug Innovation Pvt Ltd.
