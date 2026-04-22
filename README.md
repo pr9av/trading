@@ -1,6 +1,5 @@
-# Blauplug Trading Platform V2
-
-Blauplug V2 is a production-ready, real-time virtual trading platform and market analytics suite. It integrates with the Zerodha Kite Connect API for live market data and utilizes Google Gemini AI for advanced multi-period technical analysis.
+Trading Platform V2
+ V2 is a production-ready, real-time virtual trading platform and market analytics suite. It integrates with the Zerodha Kite Connect API for live market data and utilizes Google Gemini AI for advanced multi-period technical analysis.
 
 ## 🚀 Features
 
